@@ -157,7 +157,7 @@ end
 Users.call
 ```
 
-If you plugin can receive options, you can call it as `plugin reverse: options`, where `options` can be anything (e.g. `Hash`, `Array`, `Object`, etc).
+If your plugin can receive options, you can call it as `plugin reverse: options`, where `options` can be anything (e.g. `Hash`, `Array`, `Object`, etc).
 
 ## Benchmarks
 
