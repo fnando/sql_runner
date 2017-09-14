@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-meta"
   spec.add_development_dependency "pg"
   spec.add_development_dependency "mocha"
+  spec.add_development_dependency "simplecov"
 end
