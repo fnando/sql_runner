@@ -1,6 +1,6 @@
 # SQLRunner
 
-[![Travis-CI](https://travis-ci.org/fnando/sql_runner.png)](https://travis-ci.org/fnando/sql_runner)
+[![Travis-CI](https://travis-ci.org/fnando/sql_runner.svg)](https://travis-ci.org/fnando/sql_runner)
 [![Code Climate](https://codeclimate.com/github/fnando/sql_runner/badges/gpa.svg)](https://codeclimate.com/github/fnando/sql_runner)
 [![Test Coverage](https://codeclimate.com/github/fnando/sql_runner/badges/coverage.svg)](https://codeclimate.com/github/fnando/sql_runner/coverage)
 [![Gem](https://img.shields.io/gem/v/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
