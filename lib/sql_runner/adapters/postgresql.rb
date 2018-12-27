@@ -6,7 +6,7 @@ module SQLRunner
       def self.load
         require "pg"
       rescue LoadError
-        fail MissingDependency, "make sure the pg gem is available"
+        raise MissingDependency, "make sure the pg gem is available"
       end
 
       def initialize(connection_string)
@@ -86,7 +86,7 @@ module SQLRunner
 
       private def extract_args(query, bindings, bind_vars)
         bindings.each_with_object([]) do |(name, position), buffer|
-          buffer[position - 1] = bind_vars.fetch(name) { fail InvalidPreparedStatement, "missing value for :#{name} in #{query}" }
+          buffer[position - 1] = bind_vars.fetch(name) { raise InvalidPreparedStatement, "missing value for :#{name} in #{query}" }
         end
       end
     end
