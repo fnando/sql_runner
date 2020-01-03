@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLRunner
   class Query
     module Model
@@ -13,7 +15,7 @@ module SQLRunner
       def call(**bind_vars)
         result = super(**bind_vars)
         return unless result
-        return model.new(result) if result.kind_of?(Hash)
+        return model.new(result) if result.is_a?(Hash)
 
         result.to_a.map do |attrs|
           model.new(attrs)

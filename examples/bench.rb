@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.push File.expand_path("#{__dir__}/../lib")
 require "sql_runner"
 require "virtus"
@@ -13,7 +15,9 @@ SQLRunner.pool = 25
 SQLRunner.timeout = 10
 SQLRunner.root_dir = "#{__dir__}/sql"
 
-ActiveRecord::Base.establish_connection("#{connection_string}&prepared_statements=false&pool=25")
+ActiveRecord::Base.establish_connection(
+  "#{connection_string}&prepared_statements=false&pool=25"
+)
 
 module Types
   include Dry::Types.module
@@ -77,10 +81,22 @@ class Users < SQLRunner::Query
 end
 
 Benchmark.ips do |x|
-  x.report("activerecord - find one            ") { User.find_by_email("me@fnando.com") }
-  x.report("  sql_runner - find one (dry-types)") { FindUserDry.call(email: "me@fnando.com") }
-  x.report("  sql_runner - find one (virtus)   ") { FindUserVirtus.call(email: "me@fnando.com") }
-  x.report("  sql_runner - find one (raw)      ") { FindUser.call(email: "me@fnando.com") }
+  x.report("activerecord - find one") do
+    User.find_by_email("me@fnando.com")
+  end
+
+  x.report("  sql_runner - find one (dry-types)") do
+    FindUserDry.call(email: "me@fnando.com")
+  end
+
+  x.report("  sql_runner - find one (virtus)") do
+    FindUserVirtus.call(email: "me@fnando.com")
+  end
+
+  x.report("  sql_runner - find one (raw)      ") do
+    FindUser.call(email: "me@fnando.com")
+  end
+
   x.compare!
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLRunner
   RecordNotFound     = Class.new(StandardError)
   PluginNotFound     = Class.new(StandardError)
@@ -6,7 +8,7 @@ module SQLRunner
   class Query
     extend Runner
 
-    PLUGINS = {}
+    PLUGINS = {}.freeze
 
     def self.query_name(*values)
       @query_name = values.first if values.any?
@@ -14,9 +16,13 @@ module SQLRunner
     end
 
     def self.query_name_from_class
+      replacer = proc do
+        "#{Regexp.last_match(1)}_#{Regexp.last_match(2).downcase}"
+      end
+
       name
         .gsub("::", "/")
-        .gsub(/([a-z0-9])([A-Z])/) { "#{$1}_#{$2.downcase}" }
+        .gsub(/([a-z0-9])([A-Z])/, &replacer)
         .downcase
     end
 
@@ -43,20 +49,23 @@ module SQLRunner
     end
 
     def self.plugin(*names)
-      plugins *names
+      plugins(*names)
     end
 
     def self.plugins(*names)
       names = prepare_plugins_with_options(names)
 
       names.each do |name, options|
-        plugin = PLUGINS.fetch(name) { fail PluginNotFound, "#{name.inspect} wasn't found" }
+        plugin = PLUGINS.fetch(name) do
+          raise PluginNotFound, "#{name.inspect} wasn't found"
+        end
+
         plugin.activate(self, options)
       end
     end
 
     def self.prepare_plugins_with_options(plugins)
-      return plugins unless plugins.last.kind_of?(Hash)
+      return plugins unless plugins.last.is_a?(Hash)
 
       plugins_with_options = plugins.pop
 

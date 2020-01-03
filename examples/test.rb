@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.push File.expand_path("#{__dir__}/../lib")
 require "sql_runner"
 require "virtus"
@@ -7,15 +9,17 @@ SQLRunner.pool = 25
 SQLRunner.timeout = 10
 SQLRunner.root_dir = "#{__dir__}/sql"
 
-result = SQLRunner.execute "select application_name from pg_stat_activity where pid = pg_backend_pid();"
+result = SQLRunner.execute(
+  "select application_name from pg_stat_activity where pid = pg_backend_pid();"
+)
 p result.to_a
 
-result = SQLRunner.execute <<-SQL, name: "john", age: 18
-select
-  'hello'::text as message,
-  :name::text as name,
-  :age::integer as age,
-  :name::text as name2
+result = SQLRunner.execute <<~SQL, name: "john", age: 18
+  select
+    'hello'::text as message,
+    :name::text as name,
+    :age::integer as age,
+    :name::text as name2
 SQL
 p result.to_a
 
@@ -86,8 +90,8 @@ p FindCustomer.call!(email: "me@fnando.com")
 
 begin
   FindUser.call!(email: "me@fnando.coms")
-rescue SQLRunner::RecordNotFound => error
-  p error
+rescue SQLRunner::RecordNotFound => e
+  p e
 end
 
 SQLRunner.disconnect

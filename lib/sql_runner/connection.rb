@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLRunner
   module Connection
     def self.call(connection_string)
@@ -18,7 +20,7 @@ module SQLRunner
     end
 
     def disconnect
-      connection_pool && connection_pool.shutdown {|conn| conn.disconnect } && (@connection_pool = nil)
+      connection_pool&.shutdown(&:disconnect) && (@connection_pool = nil)
     end
 
     def connection_pool

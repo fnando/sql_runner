@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLRunner
   module Adapters
     class PostgreSQL
@@ -19,16 +21,14 @@ module SQLRunner
       rescue PG::ConnectionBad
         ended = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-        if ended - started < SQLRunner.timeout
-          sleep 0.1
-          connect(started)
-        else
-          raise
-        end
+        raise unless ended - started < SQLRunner.timeout
+
+        sleep 0.1
+        connect(started)
       end
 
       def disconnect
-        @connection && @connection.close && (@connection = nil)
+        @connection&.close && (@connection = nil)
       end
 
       def reconnect
@@ -36,9 +36,7 @@ module SQLRunner
         connect
       end
 
-      def connection
-        @connection
-      end
+      attr_reader :connection
 
       def execute(query, **bind_vars)
         query, bindings = parse(query)
@@ -56,24 +54,24 @@ module SQLRunner
       end
 
       def to_s
-        %[#<#{self.class.name} #{"0x00%x" % (object_id << 1)}>]
+        %[#<#{self.class.name} #{format('0x00%x', (object_id << 1))}>]
       end
 
       def inspect
         to_s
       end
 
-      def parse(query)
+      def parse(query) # rubocop:disable Metrics/MethodLength
         bindings = {}
         count = 0
 
         parsed_query = query.gsub(/(:?):([a-zA-Z]\w*)/) do |match|
-          next match if $1 == ":" # skip type casting
+          next match if Regexp.last_match(1) == ":" # skip type casting
 
           name = match[1..-1]
           sym_name = name.to_sym
 
-          if (!index = bindings[sym_name])
+          unless (index = bindings[sym_name])
             index = (count += 1)
             bindings[sym_name] = index
           end
@@ -86,7 +84,10 @@ module SQLRunner
 
       private def extract_args(query, bindings, bind_vars)
         bindings.each_with_object([]) do |(name, position), buffer|
-          buffer[position - 1] = bind_vars.fetch(name) { raise InvalidPreparedStatement, "missing value for :#{name} in #{query}" }
+          buffer[position - 1] = bind_vars.fetch(name) do
+            raise InvalidPreparedStatement,
+                  "missing value for :#{name} in #{query}"
+          end
         end
       end
     end

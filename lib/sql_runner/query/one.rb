@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLRunner
   class Query
     module One
@@ -11,7 +13,14 @@ module SQLRunner
       end
 
       def call!(**bind_vars)
-        call(**bind_vars) or fail SQLRunner::RecordNotFound, "#{name}: record was not found with #{bind_vars.inspect} arguments"
+        result = call(**bind_vars)
+
+        return if result
+
+        raise(
+          SQLRunner::RecordNotFound,
+          "#{name}: record was not found with #{bind_vars.inspect} arguments"
+        )
       end
     end
   end

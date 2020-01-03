@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "uri"
 require "connection_pool"
 

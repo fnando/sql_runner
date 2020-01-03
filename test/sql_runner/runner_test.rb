@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class RunnerTest < Minitest::Test
@@ -13,7 +15,11 @@ class RunnerTest < Minitest::Test
   end
 
   test "replaces bindings" do
-    result = SQLRunner.execute "select n FROM generate_series(:start::integer, :end::integer) n", start: 1, end: 5
+    result = SQLRunner.execute(
+      "select n FROM generate_series(:start::integer, :end::integer) n",
+      start: 1,
+      end: 5
+    )
 
     assert_equal %w[1 2 3 4 5], result.values.flatten
   end

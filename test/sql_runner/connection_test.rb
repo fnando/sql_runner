@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class ConnectionTest < Minitest::Test
@@ -28,7 +30,13 @@ class ConnectionTest < Minitest::Test
   end
 
   test "creates pool with specified configuration" do
-    ConnectionPool.expects(:new).with(timeout: SQLRunner.timeout, size: SQLRunner.pool)
+    ConnectionPool
+      .expects(:new)
+      .with(timeout: SQLRunner.timeout, size: SQLRunner.pool)
+
     SQLRunner.connect "postgresql:///test"
+  end
+
+  test "reconnects when connecting fails" do
   end
 end
