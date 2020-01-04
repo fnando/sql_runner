@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = <<~TEXT.gsub(/\n/, " ")
     SQLRunner allows you to load your queries out of SQL files, without using
-    ORMs. Available only for PostgreSQL.
+    ORMs.
   TEXT
 
   spec.description   = spec.summary

@@ -6,7 +6,7 @@
 [![Gem](https://img.shields.io/gem/v/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 [![Gem](https://img.shields.io/gem/dt/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 
-SQLRunner allows you to load your queries out of SQL files, without using ORMs. Available only for PostgreSQL.
+SQLRunner allows you to load your queries out of SQL files, without using ORMs. Available for PostgreSQL and MySQL.
 
 ## Installation
 
