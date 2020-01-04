@@ -7,14 +7,16 @@ module SQLRunner
   module Adapters
     require "sql_runner/adapters/postgresql"
 
-    ADAPTERS = {}.freeze
+    def self.registry
+      @registry ||= {}
+    end
 
     def self.register(name, adapter)
-      ADAPTERS[name] = adapter
+      registry[name] = adapter
     end
 
     def self.find(name)
-      adapter = ADAPTERS.fetch(name) do
+      adapter = registry.fetch(name) do
         raise UnsupportedDatabase, "#{name} is not supported by SQLRunner"
       end
 

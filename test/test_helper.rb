@@ -22,3 +22,7 @@ module Minitest
     end
   end
 end
+
+Dir["./test/support/**/*.rb"].sort.each do |file|
+  require file
+end

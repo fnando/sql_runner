@@ -145,8 +145,11 @@ module ReverseRecords
     super(**bind_vars).to_a.reverse
   end
 end
+```
 
 # Register the plugin.
+
+```ruby
 SQLRunner::Query.register_plugin :reverse, ReverseRecords
 
 class Users < SQLRunner::Query

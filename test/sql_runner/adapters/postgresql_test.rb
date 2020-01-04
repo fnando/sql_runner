@@ -2,10 +2,8 @@
 
 require "test_helper"
 
-class PostgresqlTest < Minitest::Test
-  test "raises exception when dependency is missing" do
-    adapter = SQLRunner::Adapters::PostgreSQL
-    adapter.stubs(:require).raises(LoadError)
-    assert_raises(SQLRunner::MissingDependency) { adapter.load }
-  end
-end
+assert_adapter(
+  connection_string: "postgresql:///test?application_name=sql_runner",
+  raw_result_class: PG::Result,
+  adapter: SQLRunner::Adapters::PostgreSQL
+)

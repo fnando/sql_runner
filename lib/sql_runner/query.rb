@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
 module SQLRunner
-  RecordNotFound     = Class.new(StandardError)
-  PluginNotFound     = Class.new(StandardError)
+  RecordNotFound = Class.new(StandardError)
+  PluginNotFound = Class.new(StandardError)
   InvalidPluginOrder = Class.new(StandardError)
+
+  def self.plugin_registry
+    @plugin_registry ||= {}
+  end
 
   class Query
     extend Runner
-
-    PLUGINS = {}.freeze
 
     def self.query_name(*values)
       @query_name = values.first if values.any?
@@ -45,7 +47,7 @@ module SQLRunner
     end
 
     def self.register_plugin(name, mod)
-      PLUGINS[name] = mod
+      SQLRunner.plugin_registry[name] = mod
     end
 
     def self.plugin(*names)
@@ -56,7 +58,7 @@ module SQLRunner
       names = prepare_plugins_with_options(names)
 
       names.each do |name, options|
-        plugin = PLUGINS.fetch(name) do
+        plugin = SQLRunner.plugin_registry.fetch(name) do
           raise PluginNotFound, "#{name.inspect} wasn't found"
         end
 

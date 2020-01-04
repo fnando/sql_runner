@@ -25,5 +25,5 @@ module SQLRunner
   Query.register_plugin :model, Query::Model
 
   self.timeout = Integer(ENV.fetch("SQL_CONNECTION_TIMEOUT", 5))
-  self.pool    = Integer(ENV.fetch("SQL_CONNECTION_POOL", 5))
+  self.pool = Integer(ENV.fetch("SQL_CONNECTION_POOL", 5))
 end
