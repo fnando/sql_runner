@@ -93,7 +93,7 @@ Benchmark.ips do |x|
     FindUserVirtus.call(email: "me@fnando.com")
   end
 
-  x.report("  sql_runner - find one (raw)      ") do
+  x.report("  sql_runner - find one (raw)") do
     FindUser.call(email: "me@fnando.com")
   end
 
