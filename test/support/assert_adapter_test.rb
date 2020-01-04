@@ -66,7 +66,37 @@ end
 def query_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect(options.fetch(:connection_string))
+      SQLRunner.connect options.fetch(:connection_string)
+    end
+
+    teardown do
+      SQLRunner.disconnect
+    end
+
+    test "inherits connection" do
+      base_class = Class.new(SQLRunner::Query) do
+        connect options.fetch(:connection_string)
+      end
+
+      query_class = Class.new(base_class) do
+        query "select 'hello' as name"
+      end
+
+      assert_equal base_class.connection_pool, query_class.connection_pool
+      refute_equal SQLRunner.connection_pool, query_class.connection_pool
+    end
+
+    test "inherits root dir" do
+      base_class = Class.new(SQLRunner::Query) do
+        root_dir "/some/dir"
+      end
+
+      query_class = Class.new(base_class) do
+        query "select 'hello' as name"
+      end
+
+      assert_equal base_class.root_dir, query_class.root_dir
+      refute_equal SQLRunner.root_dir, query_class.root_dir
     end
 
     test "returns default root dir when not specified" do

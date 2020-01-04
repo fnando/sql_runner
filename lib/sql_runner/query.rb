@@ -13,6 +13,11 @@ module SQLRunner
   class Query
     extend Runner
 
+    def self.inherited(subclass)
+      subclass.instance_variable_set(:@connection_pool, @connection_pool)
+      subclass.instance_variable_set(:@root_dir, @root_dir)
+    end
+
     def self.query_name(*values)
       @query_name = values.first if values.any?
       @query_name || (@query_name = query_name_from_class)
