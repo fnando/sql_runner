@@ -2,23 +2,30 @@
 
 module SQLRunner
   module Adapters
-    class PostgreSQL
+    class MySQL
       InvalidPreparedStatement = Class.new(StandardError)
 
       def self.load
-        require "pg"
+        require "mysql2"
       rescue LoadError
-        raise MissingDependency, "make sure the `pg` gem is available"
+        raise MissingDependency, "make sure the `mysql2` gem is available"
       end
 
       def initialize(connection_string)
         @connection_string = connection_string
+        @uri = URI.parse(@connection_string)
         connect
       end
 
       def connect(started = Process.clock_gettime(Process::CLOCK_MONOTONIC))
-        @connection = PG.connect(@connection_string)
-      rescue PG::ConnectionBad
+        @connection = Mysql2::Client.new(
+          host: @uri.host,
+          port: @uri.port,
+          username: @uri.user,
+          password: @uri.password,
+          database: @uri.path[1..-1]
+        )
+      rescue Mysql2::Error
         ended = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
         raise unless ended - started < SQLRunner.timeout
@@ -37,17 +44,19 @@ module SQLRunner
       end
 
       def execute(query, **bind_vars)
-        bound_query, bindings = parse(query)
-        args = extract_args(query, bindings, bind_vars)
-        @connection.exec_params(bound_query, args)
-      rescue PG::ConnectionBad
+        bound_query, bindings, names = parse(query, bind_vars)
+        validate_bindings(query, bind_vars, names)
+
+        statement = @connection.prepare(bound_query)
+        statement.execute(*bindings, cast: true)
+      rescue Mysql2::Error
         reconnect
         execute(query, **bind_vars)
       end
 
       def active?
-        @connection && @connection.status == PG::Connection::CONNECTION_OK
-      rescue PGError
+        !@connection&.closed?
+      rescue Mysql2::Error
         false
       end
 
@@ -59,33 +68,30 @@ module SQLRunner
         to_s
       end
 
-      def parse(query) # rubocop:disable Metrics/MethodLength
-        bindings = {}
-        count = 0
+      def parse(query, bind_vars)
+        bindings = []
+        names = []
 
         parsed_query = query.gsub(/(:?):([a-zA-Z]\w*)/) do |match|
           next match if Regexp.last_match(1) == ":" # skip type casting
 
           name = match[1..-1]
           sym_name = name.to_sym
+          names << sym_name
+          bindings << bind_vars[sym_name]
 
-          unless (index = bindings[sym_name])
-            index = (count += 1)
-            bindings[sym_name] = index
-          end
-
-          "$#{index}"
+          "?"
         end
 
-        [parsed_query, bindings]
+        [parsed_query, bindings, names]
       end
 
-      private def extract_args(query, bindings, bind_vars)
-        bindings.each_with_object([]) do |(name, position), buffer|
-          buffer[position - 1] = bind_vars.fetch(name) do
-            raise InvalidPreparedStatement,
-                  "missing value for :#{name} in #{query}"
-          end
+      private def validate_bindings(query, bind_vars, names)
+        names.each do |name|
+          next if bind_vars.key?(name)
+
+          raise InvalidPreparedStatement,
+                "missing value for :#{name} in #{query}"
         end
       end
     end

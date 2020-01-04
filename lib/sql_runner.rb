@@ -19,6 +19,8 @@ module SQLRunner
 
   Adapters.register("postgres", Adapters::PostgreSQL)
   Adapters.register("postgresql", Adapters::PostgreSQL)
+  Adapters.register("mysql", Adapters::MySQL)
+  Adapters.register("mysql2", Adapters::MySQL)
 
   Query.register_plugin :one, Query::One
   Query.register_plugin :many, Query::Many

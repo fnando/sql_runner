@@ -4,6 +4,7 @@ module SQLRunner
   RecordNotFound = Class.new(StandardError)
   PluginNotFound = Class.new(StandardError)
   InvalidPluginOrder = Class.new(StandardError)
+  NotImplemented = Class.new(StandardError)
 
   def self.plugin_registry
     @plugin_registry ||= {}

@@ -2,21 +2,22 @@
 
 module SQLRunner
   UnsupportedDatabase = Class.new(StandardError)
-  MissingDependency   = Class.new(StandardError)
+  MissingDependency = Class.new(StandardError)
+
+  def self.adapter_registry
+    @adapter_registry ||= {}
+  end
 
   module Adapters
     require "sql_runner/adapters/postgresql"
-
-    def self.registry
-      @registry ||= {}
-    end
+    require "sql_runner/adapters/mysql"
 
     def self.register(name, adapter)
-      registry[name] = adapter
+      SQLRunner.adapter_registry[name] = adapter
     end
 
     def self.find(name)
-      adapter = registry.fetch(name) do
+      adapter = SQLRunner.adapter_registry.fetch(name) do
         raise UnsupportedDatabase, "#{name} is not supported by SQLRunner"
       end
 

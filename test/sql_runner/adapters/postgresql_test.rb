@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "pg"
 
 assert_adapter(
   connection_string: "postgresql:///test?application_name=sql_runner",

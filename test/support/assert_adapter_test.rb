@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
 def assert_adapter(options)
+  SQLRunner.root_dir = File.expand_path("#{__dir__}/../fixtures/sql")
+  SQLRunner.connect options.fetch(:connection_string)
+  SQLRunner.execute "DROP TABLE IF EXISTS users"
+  SQLRunner.execute "CREATE TABLE IF NOT EXISTS users (email text not null)"
+  SQLRunner.execute("INSERT INTO users (email) VALUES ('john@example.com')")
+  SQLRunner.execute("INSERT INTO users (email) VALUES ('mary@example.com')")
+
   runner_tests(options)
   missing_adapter_tests(options)
   query_tests(options)
   connection_tests(options)
+  plugin_tests(options)
   plugin_one_tests(options)
   plugin_many_tests(options)
   plugin_model_tests(options)
@@ -17,20 +25,29 @@ def runner_tests(options)
     end
 
     test "returns raw result" do
-      result = SQLRunner.execute "select application_name from pg_stat_activity"
+      result = SQLRunner.execute "select cast(1 as char) as number"
 
       assert_kind_of options.fetch(:raw_result_class), result
-      assert_includes result.to_a, "application_name" => "sql_runner"
+      assert_includes result.to_a, "number" => "1"
     end
 
     test "replaces bindings" do
       result = SQLRunner.execute(
-        "select n FROM generate_series(:start::integer, :end::integer) n",
-        start: 1,
-        end: 5
-      )
+        "select :name as name, cast(:id as char) as id",
+        name: "John",
+        id: 5
+      ).to_a
 
-      assert_equal %w[1 2 3 4 5], result.values.flatten
+      row = {"name" => "John", "id" => "5"}
+
+      assert_equal 1, result.size
+      assert_equal row, result[0]
+    end
+
+    test "fails with missing bindings" do
+      assert_raises("missing value for :name in select :name as name") do
+        SQLRunner.execute("select :name as name")
+      end
     end
   end
 end
@@ -93,25 +110,25 @@ def query_tests(options)
         query_name "one"
       end
 
-      assert_equal "SELECT 1", query_class.query.chomp
+      assert_equal "select 1", query_class.query.chomp
     end
 
     test "returns specified query" do
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT 2"
+        query "select 2"
       end
 
-      assert_equal "SELECT 2", query_class.query
+      assert_equal "select 2", query_class.query
     end
 
     test "executes specified query" do
-      SQLRunner.connect "postgresql:///test"
+      SQLRunner.connect options.fetch(:connection_string)
 
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT 2 AS n"
+        query "select cast(2 as char) as number"
       end
 
-      assert_equal [{"n" => "2"}], query_class.call.to_a
+      assert_equal [{"number" => "2"}], query_class.call.to_a
     end
 
     test "uses specified connection" do
@@ -126,15 +143,17 @@ def query_tests(options)
     end
 
     test "uses bindings" do
-      SQLRunner.connect "postgresql:///test"
+      SQLRunner.connect options.fetch(:connection_string)
 
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT n FROM generate_series(:start::integer, :end::integer) n"
+        query "select * from users where email = :email"
       end
 
-      result = query_class.call(start: 1, end: 5)
+      result = query_class.call(email: "john@example.com")
 
-      assert_equal %w[1 2 3 4 5], result.values.flatten
+      row = {"email" => "john@example.com"}
+
+      assert_equal row, result.to_a.first
     end
   end
 end
@@ -191,16 +210,18 @@ def plugin_one_tests(options)
 
     test "returns just one record" do
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT n FROM generate_series(1, 5) n"
+        query "select * from users limit 1"
         plugin :one
       end
 
-      assert_equal Hash["n", "1"], query_class.call
+      row = {"email" => "john@example.com"}
+
+      assert_equal row, query_class.call
     end
 
     test "raises exception when record is not found" do
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT * FROM users WHERE email = :email LIMIT 1"
+        query "select * from users where email = :email limit 1"
         plugin :one
       end
 
@@ -223,11 +244,16 @@ def plugin_many_tests(options)
 
     test "returns several records" do
       query_class = Class.new(SQLRunner::Query) do
-        query "SELECT n FROM generate_series(1, 2) n"
+        query "SELECT * FROM users"
         plugin :many
       end
 
-      assert_equal [{"n" => "1"}, {"n" => "2"}], query_class.call
+      rows = [
+        {"email" => "john@example.com"},
+        {"email" => "mary@example.com"}
+      ]
+
+      assert_equal rows, query_class.call
     end
   end
 end
@@ -266,6 +292,27 @@ def plugin_model_tests(options)
       assert_equal 1, records.size
       assert_equal "John", records.first.name
       assert_equal "john@example.com", records.first.email
+    end
+  end
+end
+
+def plugin_tests(options)
+  Class.new(Minitest::Test) do
+    setup do
+      SQLRunner.connect options.fetch(:connection_string)
+    end
+
+    teardown do
+      SQLRunner.disconnect
+    end
+
+    test "raises exception for missing plugins" do
+      assert_raises(SQLRunner::PluginNotFound, ":missing wasn't found") do
+        Class.new(SQLRunner::Query) do
+          query "SELECT 1"
+          plugin :missing
+        end
+      end
     end
   end
 end
