@@ -3,16 +3,25 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-- 2.5.2
+  - 2.7.0
+services:
+  - mysql
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
 before_script:
-- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-- chmod +x ./cc-test-reporter
-- "./cc-test-reporter before-build"
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - "./cc-test-reporter before-build"
 after_script:
-- "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
+  - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 before_install:
-- gem install bundler
-- createdb test
+  - gem install bundler
+  - createdb test
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
 notifications:
   email: false
 env:
