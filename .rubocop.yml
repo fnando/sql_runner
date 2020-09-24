@@ -4,3 +4,9 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 2.6
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false

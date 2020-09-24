@@ -59,12 +59,13 @@ module SQLRunner
         to_s
       end
 
-      def parse(query) # rubocop:disable Metrics/MethodLength
+      def parse(query)
         bindings = {}
         count = 0
 
         parsed_query = query.gsub(/(:?):([a-zA-Z]\w*)/) do |match|
-          next match if Regexp.last_match(1) == ":" # skip type casting
+          # skip type casting
+          next match if Regexp.last_match(1) == ":"
 
           name = match[1..-1]
           sym_name = name.to_sym

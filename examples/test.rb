@@ -90,8 +90,8 @@ p FindCustomer.call!(email: "me@fnando.com")
 
 begin
   FindUser.call!(email: "me@fnando.coms")
-rescue SQLRunner::RecordNotFound => e
-  p e
+rescue SQLRunner::RecordNotFound => error
+  p error
 end
 
 SQLRunner.disconnect
