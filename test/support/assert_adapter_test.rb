@@ -21,7 +21,7 @@ end
 def runner_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect(options.fetch(:connection_string))
+      options[:setup].call(options)
     end
 
     test "returns raw result" do
@@ -66,7 +66,7 @@ end
 def query_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect options.fetch(:connection_string)
+      options[:setup].call(options)
     end
 
     teardown do
@@ -189,8 +189,6 @@ def query_tests(options)
 end
 
 def connection_tests(options)
-  connection_string = options.fetch(:connection_string)
-
   Class.new(Minitest::Test) do
     teardown do
       SQLRunner.disconnect
@@ -203,18 +201,20 @@ def connection_tests(options)
     end
 
     test "returns database connection" do
-      SQLRunner.connect(connection_string)
+      options[:setup].call(options)
       SQLRunner.with_connection do |conn|
         assert conn.active?
       end
     end
 
     test "raises exception when checking out connection on shutdown pool" do
-      SQLRunner.connect(connection_string)
+      options[:setup].call(options)
       SQLRunner.disconnect
 
       assert_raises(ConnectionPool::PoolShuttingDownError) do
-        SQLRunner.with_connection {|conn| }
+        SQLRunner.with_connection do |conn|
+          # noop
+        end
       end
     end
 
@@ -223,7 +223,7 @@ def connection_tests(options)
         .expects(:new)
         .with(timeout: SQLRunner.timeout, size: SQLRunner.pool)
 
-      SQLRunner.connect(connection_string)
+      options[:setup].call(options)
     end
   end
 end
@@ -265,7 +265,7 @@ end
 def plugin_many_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect options.fetch(:connection_string)
+      options[:setup].call(options)
     end
 
     teardown do
@@ -291,7 +291,7 @@ end
 def plugin_model_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect options.fetch(:connection_string)
+      options[:setup].call(options)
     end
 
     teardown do
@@ -329,7 +329,7 @@ end
 def plugin_tests(options)
   Class.new(Minitest::Test) do
     setup do
-      SQLRunner.connect options.fetch(:connection_string)
+      options[:setup].call(options)
     end
 
     teardown do

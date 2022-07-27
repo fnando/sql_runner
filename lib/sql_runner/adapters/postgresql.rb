@@ -11,6 +11,12 @@ module SQLRunner
         raise MissingDependency, "make sure the `pg` gem is available"
       end
 
+      def self.create_connection_pool(timeout:, size:, connection_string:)
+        ConnectionPool.new(timeout: timeout, size: size) do
+          new(connection_string)
+        end
+      end
+
       def initialize(connection_string)
         @connection_string = connection_string
         connect

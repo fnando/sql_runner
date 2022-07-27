@@ -6,9 +6,11 @@ module SQLRunner
       uri = URI.parse(connection_string)
       adapter = Adapters.find(uri.scheme)
 
-      ConnectionPool.new(timeout: SQLRunner.timeout, size: SQLRunner.pool) do
-        adapter.new(connection_string)
-      end
+      adapter.create_connection_pool(
+        timeout: SQLRunner.timeout,
+        size: SQLRunner.pool,
+        connection_string: connection_string
+      )
     end
 
     def with_connection(&block)

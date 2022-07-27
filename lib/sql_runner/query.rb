@@ -14,6 +14,7 @@ module SQLRunner
     extend Runner
 
     def self.inherited(subclass)
+      super
       subclass.instance_variable_set(:@connection_pool, @connection_pool)
       subclass.instance_variable_set(:@root_dir, @root_dir)
     end
