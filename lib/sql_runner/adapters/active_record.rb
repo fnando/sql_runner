@@ -27,6 +27,18 @@ module SQLRunner
         end
       end
 
+      class SQLite < SQLRunner::Adapters::SQLite
+        def initialize(connection) # rubocop:disable Lint/MissingSuper
+          @connection = connection
+        end
+
+        def connect(*)
+        end
+
+        def disconnect(*)
+        end
+      end
+
       class ConnectionPool
         def with
           ::ActiveRecord::Base.connection_pool.with_connection do |connection|
@@ -37,8 +49,12 @@ module SQLRunner
                         PostgreSQL.new(connection)
                       when "Mysql2::Client"
                         MySQL.new(connection)
+                      when "SQLite3::Database"
+                        SQLite.new(connection)
                       else
-                        raise UnsupportedDatabase
+                        raise UnsupportedDatabase,
+                              "#{connection.class.name} is not yet supported " \
+                              "by the SQLRunner's ActiveRecord adapter"
                       end
 
             yield(adapter)
