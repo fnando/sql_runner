@@ -54,10 +54,12 @@ module SQLRunner
         validate_bindings(query, bind_vars, names)
 
         statement = @connection.prepare(bound_query)
-        statement.execute(*bindings, cast: true)
-      rescue Mysql2::Error
-        reconnect
-        execute(query, **bind_vars)
+        statement.execute(
+          *bindings,
+          cast: true,
+          as: :hash,
+          cast_booleans: true
+        )
       end
 
       def active?

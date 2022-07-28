@@ -17,6 +17,7 @@ module SQLRunner
   extend Configuration
   extend Runner
 
+  Adapters.register("activerecord", Adapters::ActiveRecord)
   Adapters.register("postgres", Adapters::PostgreSQL)
   Adapters.register("postgresql", Adapters::PostgreSQL)
   Adapters.register("mysql", Adapters::MySQL)

@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+DEFAULT_TESTS = %i[
+  runner
+  missing_adapter
+  query
+  connection
+  plugin
+  plugin_one
+  plugin_many
+  plugin_model
+].freeze
+
 def assert_adapter(options)
   SQLRunner.root_dir = File.expand_path("#{__dir__}/../fixtures/sql")
   SQLRunner.connect options.fetch(:connection_string)
@@ -7,15 +18,12 @@ def assert_adapter(options)
   SQLRunner.execute "CREATE TABLE IF NOT EXISTS users (email text not null)"
   SQLRunner.execute("INSERT INTO users (email) VALUES ('john@example.com')")
   SQLRunner.execute("INSERT INTO users (email) VALUES ('mary@example.com')")
+  SQLRunner.disconnect
 
-  runner_tests(options)
-  missing_adapter_tests(options)
-  query_tests(options)
-  connection_tests(options)
-  plugin_tests(options)
-  plugin_one_tests(options)
-  plugin_many_tests(options)
-  plugin_model_tests(options)
+  tests = options[:tests] || DEFAULT_TESTS
+  tests.each do |test|
+    send("#{test}_tests", options)
+  end
 end
 
 def runner_tests(options)
@@ -247,6 +255,7 @@ def plugin_one_tests(options)
       row = {"email" => "john@example.com"}
 
       assert_equal row, query_class.call
+      assert_equal row, query_class.call!
     end
 
     test "raises exception when record is not found" do

@@ -11,6 +11,7 @@ module SQLRunner
   module Adapters
     require "sql_runner/adapters/postgresql"
     require "sql_runner/adapters/mysql"
+    require "sql_runner/adapters/active_record"
 
     def self.register(name, adapter)
       SQLRunner.adapter_registry[name] = adapter

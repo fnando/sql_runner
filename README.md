@@ -6,7 +6,8 @@
 [![Gem](https://img.shields.io/gem/v/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 [![Gem](https://img.shields.io/gem/dt/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 
-SQLRunner allows you to load your queries out of SQL files, without using ORMs. Available for PostgreSQL and MySQL.
+SQLRunner allows you to load your queries out of SQL files, without using ORMs.
+Available for PostgreSQL and MySQL.
 
 ## Installation
 
@@ -76,6 +77,22 @@ class GetMembers < SQLRunner::Query
 end
 ```
 
+You can use this with ActiveRecord as well. To make it work, all you need to do
+is establishing the connection using `activerecord:///`:
+
+```ruby
+require "active_record"
+
+# You probably won't need this if you're using Rails.
+ActiveRecord::Base.establish_connection("postgresql:///database")
+
+# Set the adapter to be based on ActiveRecord.
+SQLRunner.connect "activerecord:///"
+
+SQLRunner.execute "SELECT 1"
+#=> <PG:Result:0x008adf4d5495b0>
+```
+
 ### Plugins
 
 #### Load just one record
@@ -133,7 +150,9 @@ FindUsers.call
 
 ### Adding new plugins
 
-First you have to create a class/module that implements the `.activate(target, options)` class method. The following example overrides the `call(**bind_vars)` method by using `Module.prepend`.
+First you have to create a class/module that implements the
+`.activate(target, options)` class method. The following example overrides the
+`call(**bind_vars)` method by using `Module.prepend`.
 
 ```ruby
 module ReverseRecords
@@ -147,7 +166,7 @@ module ReverseRecords
 end
 ```
 
-# Register the plugin.
+#### Register the plugin.
 
 ```ruby
 SQLRunner::Query.register_plugin :reverse, ReverseRecords
@@ -160,11 +179,17 @@ end
 Users.call
 ```
 
-If your plugin can receive options, you can call it as `plugin reverse: options`, where `options` can be anything (e.g. `Hash`, `Array`, `Object`, etc).
+If your plugin can receive options, you can call it as
+`plugin reverse: options`, where `options` can be anything (e.g. `Hash`,
+`Array`, `Object`, etc).
 
 ## Benchmarks
 
-You won't gain too much performance by using this gem. These are the results against ActiveRecord using different wrapping libraries like [virtus](https://rubygems.org/gems/virtus) and [dry-types](https://rubygems.org/gems/dry-types).
+You won't gain too much performance by using this gem. The idea is making SQL
+easier to read by extracting complex stuff to their own files. These are the
+results against ActiveRecord using different wrapping libraries like
+[virtus](https://rubygems.org/gems/virtus) and
+[dry-types](https://rubygems.org/gems/dry-types).
 
 Loading just one record:
 
@@ -186,14 +211,24 @@ activerecord - find many            :     2731.5 i/s - 2.49x slower
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run
+`rake test` to run the tests. You can also run `bin/console` for an interactive
+prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To
+release a new version, update the version number in `version.rb`, and then run
+`bundle exec rake release`, which will create a git tag for the version, push
+git commits and tags, and push the `.gem` file to
+[rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/fnando/sql_runner. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/fnando/sql_runner. This project is intended to be a safe,
+welcoming space for collaboration, and contributors are expected to adhere to
+the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the
+[MIT License](http://opensource.org/licenses/MIT).

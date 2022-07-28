@@ -15,7 +15,7 @@ module SQLRunner
       def call!(**bind_vars)
         result = call(**bind_vars)
 
-        return if result
+        return result if result
 
         raise(
           SQLRunner::RecordNotFound,

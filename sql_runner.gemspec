@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "connection_pool"
 
+  spec.add_development_dependency "activerecord"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "minitest-utils"
   spec.add_development_dependency "mocha"
