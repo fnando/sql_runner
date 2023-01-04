@@ -1,8 +1,5 @@
 # SQLRunner
 
-[![Travis-CI](https://travis-ci.org/fnando/sql_runner.svg)](https://travis-ci.org/fnando/sql_runner)
-[![Code Climate](https://codeclimate.com/github/fnando/sql_runner/badges/gpa.svg)](https://codeclimate.com/github/fnando/sql_runner)
-[![Test Coverage](https://codeclimate.com/github/fnando/sql_runner/badges/coverage.svg)](https://codeclimate.com/github/fnando/sql_runner/coverage)
 [![Gem](https://img.shields.io/gem/v/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 [![Gem](https://img.shields.io/gem/dt/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 
@@ -48,7 +45,7 @@ Run SQL files:
 SQLRunner.root_dir = "#{__dir__}/sql"
 
 class GetMembers < SQLRunner::Query
-  # by default will use root_dir/get_members.sql
+  # by default will use root_dir/get_members.{sql,psql}
 end
 ```
 
@@ -72,7 +69,7 @@ Specify other options:
 
 ```ruby
 class GetMembers < SQLRunner::Query
-  query_name "users" #=> will load root_dir/users.sql
+  query_name "users" #=> will load root_dir/users.{psql,sql}
   root_dir "/some/path"
 end
 ```

@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = SQLRunner::VERSION
   spec.authors       = ["Nando Vieira"]
   spec.email         = ["me@fnando.com"]
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.6.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.0.0")
   spec.metadata = {"rubygems_mfa_required" => "true"}
 
   spec.summary = <<~TEXT.tr("\n", " ")

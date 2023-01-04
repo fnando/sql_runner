@@ -145,10 +145,18 @@ def query_tests(options)
 
     test "returns inferred query" do
       query_class = Class.new(SQLRunner::Query) do
+        # test/fixtures/sql/one.sql
         query_name "one"
       end
 
       assert_equal "select 1", query_class.query.chomp
+
+      query_class = Class.new(SQLRunner::Query) do
+        # test/fixtures/sql/two.sql
+        query_name "two"
+      end
+
+      assert_equal "select 2", query_class.query.chomp
     end
 
     test "returns specified query" do

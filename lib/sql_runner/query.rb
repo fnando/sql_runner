@@ -37,7 +37,14 @@ module SQLRunner
 
     def self.query(*value)
       @query = value.first if value.any?
-      @query || (@query = File.read(File.join(root_dir, "#{query_name}.sql")))
+      @query || (@query = File.read(find_query_file))
+    end
+
+    def self.find_query_file
+      [
+        File.join(root_dir, "#{query_name}.psql"),
+        File.join(root_dir, "#{query_name}.sql")
+      ].find {|file| File.file?(file) }
     end
 
     def self.connection_pool
