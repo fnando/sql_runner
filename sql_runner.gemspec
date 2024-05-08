@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = SQLRunner::VERSION
   spec.authors       = ["Nando Vieira"]
   spec.email         = ["me@fnando.com"]
-  spec.required_ruby_version = Gem::Requirement.new(">= 3.0.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.2.0")
   spec.metadata = {"rubygems_mfa_required" => "true"}
 
   spec.summary = <<~TEXT.tr("\n", " ")
@@ -34,10 +34,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "mysql2"
   spec.add_development_dependency "pg"
-  spec.add_development_dependency "pry-meta"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "rubocop-fnando"
   spec.add_development_dependency "simplecov"
-  spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "sqlite3", "~> 1.7"
 end

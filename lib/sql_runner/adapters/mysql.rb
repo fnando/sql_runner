@@ -12,7 +12,7 @@ module SQLRunner
       end
 
       def self.create_connection_pool(timeout:, size:, connection_string:)
-        ConnectionPool.new(timeout: timeout, size: size) do
+        ConnectionPool.new(timeout:, size:) do
           new(connection_string)
         end
       end

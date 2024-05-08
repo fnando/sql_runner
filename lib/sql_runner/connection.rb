@@ -9,12 +9,12 @@ module SQLRunner
       adapter.create_connection_pool(
         timeout: SQLRunner.timeout,
         size: SQLRunner.pool,
-        connection_string: connection_string
+        connection_string:
       )
     end
 
-    def with_connection(&block)
-      connection_pool.with(&block)
+    def with_connection(&)
+      connection_pool.with(&)
     end
 
     def connect(connection_string)

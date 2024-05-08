@@ -42,7 +42,7 @@ module SQLRunner
       class ConnectionPool
         def with
           ::ActiveRecord::Base.connection_pool.with_connection do |connection|
-            connection = connection.instance_variable_get(:@connection)
+            connection = connection.raw_connection
 
             adapter = case connection.class.name
                       when "PG::Connection"

@@ -22,7 +22,7 @@ def assert_adapter(options)
 
   tests = options[:tests] || DEFAULT_TESTS
   tests.each do |test|
-    send("#{test}_tests", options)
+    send(:"#{test}_tests", options)
   end
 end
 
@@ -218,6 +218,7 @@ def connection_tests(options)
 
     test "returns database connection" do
       options[:setup].call(options)
+
       SQLRunner.with_connection do |conn|
         assert conn.active?
       end

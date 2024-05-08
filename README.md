@@ -1,5 +1,6 @@
 # SQLRunner
 
+[![ruby-tests](https://github.com/fnando/sql_runner/actions/workflows/test.yml/badge.svg)](https://github.com/fnando/sql_runner/actions/workflows/test.yml)
 [![Gem](https://img.shields.io/gem/v/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 [![Gem](https://img.shields.io/gem/dt/sql_runner.svg)](https://rubygems.org/gems/sql_runner)
 
